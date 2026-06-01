@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mol Rush Clicker</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="game-shell">
+      <canvas id="molecule-field" aria-hidden="true"></canvas>
+
+      <section class="hud hud-main" aria-label="進行状況">
+        <div class="brand">
+          <span class="brand-mark">μ</span>
+          <div>
+            <h1>Mol Rush</h1>
+            <p>分子を増やして 1 mol を突破</p>
+          </div>
+        </div>
+
+        <div class="score-block">
+          <span class="label">Molecules</span>
+          <strong id="molecule-count">0</strong>
+          <span id="mol-progress-text" class="subtext">0 mol</span>
+        </div>
+
+        <div class="progress-track" aria-label="1 mol までの進行度">
+          <div id="mol-progress-bar"></div>
+        </div>
+      </section>
+
+      <section class="lab-stage" aria-label="クリック操作">
+        <button id="click-target" class="molecule-button" type="button" aria-label="分子を増やす">
+          <span class="atom atom-a"></span>
+          <span class="atom atom-b"></span>
+          <span class="atom atom-c"></span>
+          <span class="bond bond-a"></span>
+          <span class="bond bond-b"></span>
+          <span class="tap-ring"></span>
+        </button>
+        <div id="floating-text-layer" class="floating-text-layer" aria-hidden="true"></div>
+      </section>
+
+      <aside class="hud hud-side" aria-label="研究設備">
+        <div class="stat-grid">
+          <div>
+            <span class="label">Click</span>
+            <strong id="per-click">+1</strong>
+          </div>
+          <div>
+            <span class="label">Auto</span>
+            <strong id="per-second">0/s</strong>
+          </div>
+        </div>
+
+        <div class="upgrade-list">
+          <button class="upgrade" type="button" data-upgrade="pipette">
+            <span>
+              <strong>マイクロピペット</strong>
+              <small>クリック量 +1</small>
+            </span>
+            <em id="pipette-cost">25</em>
+          </button>
+          <button class="upgrade" type="button" data-upgrade="catalyst">
+            <span>
+              <strong>触媒粒子</strong>
+              <small>毎秒生産を追加</small>
+            </span>
+            <em id="catalyst-cost">120</em>
+          </button>
+          <button class="upgrade" type="button" data-upgrade="chain">
+            <span>
+              <strong>連鎖反応</strong>
+              <small>クリック倍率 x2</small>
+            </span>
+            <em id="chain-cost">900</em>
+          </button>
+          <button class="upgrade" type="button" data-upgrade="reactor">
+            <span>
+              <strong>高圧リアクター</strong>
+              <small>全生産 x3</small>
+            </span>
+            <em id="reactor-cost">1.50e+4</em>
+          </button>
+        </div>
+
+        <button id="reset-button" class="secondary-action" type="button">リセット</button>
+      </aside>
+
+      <section id="event-banner" class="event-banner" aria-live="polite">
+        <strong id="event-title">Synthesis Ready</strong>
+        <span id="event-detail">クリックで実験開始</span>
+      </section>
+
+      <dialog id="goal-dialog" class="goal-dialog">
+        <form method="dialog">
+          <h2>1 mol 達成</h2>
+          <p>6.022 x 10^23 個の分子を超えました。実験成功です。</p>
+          <button type="submit">続ける</button>
+        </form>
+      </dialog>
+    </main>
+
+    <script src="game.js"></script>
+  </body>
+</html>

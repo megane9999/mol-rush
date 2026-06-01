@@ -1,0 +1,553 @@
+:root {
+  color-scheme: dark;
+  --bg: #09100f;
+  --panel: rgba(11, 20, 18, 0.78);
+  --panel-strong: rgba(15, 32, 28, 0.92);
+  --line: rgba(149, 255, 218, 0.24);
+  --text: #ecfff8;
+  --muted: #9fc6bb;
+  --cyan: #57f4d1;
+  --green: #95ff7a;
+  --amber: #ffd15c;
+  --red: #ff5d73;
+  --shadow: rgba(0, 0, 0, 0.38);
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 45%, rgba(87, 244, 209, 0.12), transparent 32%),
+    linear-gradient(130deg, #09100f 0%, #12201b 44%, #111318 100%);
+  color: var(--text);
+}
+
+button {
+  font: inherit;
+}
+
+.game-shell {
+  position: relative;
+  width: 100vw;
+  min-height: 100vh;
+  isolation: isolate;
+}
+
+#molecule-field {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
+.hud {
+  position: fixed;
+  z-index: 4;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  box-shadow: 0 18px 44px var(--shadow);
+  backdrop-filter: blur(16px);
+}
+
+.hud-main {
+  top: 20px;
+  left: 20px;
+  width: min(430px, calc(100vw - 40px));
+  padding: 18px;
+  border-radius: 8px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.brand-mark {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border-radius: 50%;
+  background: linear-gradient(145deg, var(--cyan), var(--green));
+  color: #05100d;
+  font-size: 26px;
+  font-weight: 900;
+  box-shadow: 0 0 28px rgba(87, 244, 209, 0.42);
+}
+
+h1,
+h2,
+p {
+  margin: 0;
+}
+
+h1 {
+  font-size: 25px;
+  line-height: 1;
+}
+
+.brand p {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.score-block {
+  display: grid;
+  gap: 4px;
+}
+
+.label {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+#molecule-count {
+  min-height: 40px;
+  color: var(--cyan);
+  font-family: "Cascadia Mono", "SFMono-Regular", Consolas, monospace;
+  font-size: clamp(28px, 5vw, 43px);
+  line-height: 1;
+  overflow-wrap: anywhere;
+  text-shadow: 0 0 22px rgba(87, 244, 209, 0.34);
+}
+
+.subtext {
+  color: var(--muted);
+  font-family: "Cascadia Mono", "SFMono-Regular", Consolas, monospace;
+  font-size: 13px;
+}
+
+.progress-track {
+  height: 10px;
+  margin-top: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(149, 255, 218, 0.2);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+#mol-progress-bar {
+  width: 0%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--cyan), var(--green), var(--amber));
+  box-shadow: 0 0 18px rgba(149, 255, 122, 0.58);
+  transition: width 180ms ease;
+}
+
+.lab-stage {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.molecule-button {
+  position: relative;
+  width: min(36vw, 280px);
+  min-width: 170px;
+  aspect-ratio: 1;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  pointer-events: auto;
+  filter: drop-shadow(0 0 30px rgba(87, 244, 209, 0.36));
+  transition:
+    transform 90ms ease,
+    filter 160ms ease;
+}
+
+.molecule-button:hover {
+  filter: drop-shadow(0 0 44px rgba(149, 255, 122, 0.44));
+}
+
+.molecule-button:active,
+.molecule-button.is-pressed {
+  transform: scale(0.94);
+}
+
+.atom,
+.bond,
+.tap-ring {
+  position: absolute;
+  display: block;
+}
+
+.atom {
+  width: 38%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 26%, rgba(255, 255, 255, 0.92), transparent 15%),
+    radial-gradient(circle at 50% 50%, var(--cyan), #147f78 72%);
+  border: 2px solid rgba(236, 255, 248, 0.55);
+  box-shadow:
+    inset -12px -18px 28px rgba(0, 0, 0, 0.28),
+    0 0 34px rgba(87, 244, 209, 0.48);
+}
+
+.atom-a {
+  top: 6%;
+  left: 32%;
+}
+
+.atom-b {
+  bottom: 11%;
+  left: 8%;
+  background:
+    radial-gradient(circle at 32% 26%, rgba(255, 255, 255, 0.92), transparent 15%),
+    radial-gradient(circle at 50% 50%, var(--green), #238c34 72%);
+}
+
+.atom-c {
+  right: 7%;
+  bottom: 17%;
+  background:
+    radial-gradient(circle at 32% 26%, rgba(255, 255, 255, 0.92), transparent 15%),
+    radial-gradient(circle at 50% 50%, var(--amber), #9b5e13 72%);
+}
+
+.bond {
+  width: 45%;
+  height: 12px;
+  border-radius: 999px;
+  background: rgba(236, 255, 248, 0.78);
+  box-shadow: 0 0 18px rgba(236, 255, 248, 0.42);
+  transform-origin: left center;
+}
+
+.bond-a {
+  top: 43%;
+  left: 32%;
+  transform: rotate(126deg);
+}
+
+.bond-b {
+  top: 44%;
+  left: 44%;
+  transform: rotate(44deg);
+}
+
+.tap-ring {
+  inset: 0;
+  border: 2px solid rgba(149, 255, 218, 0.22);
+  border-radius: 50%;
+  animation: idlePulse 2.2s ease-in-out infinite;
+}
+
+.floating-text-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.float-text {
+  position: absolute;
+  color: var(--green);
+  font-family: "Cascadia Mono", "SFMono-Regular", Consolas, monospace;
+  font-size: 20px;
+  font-weight: 900;
+  text-shadow: 0 0 14px rgba(149, 255, 122, 0.9);
+  animation: floatUp 760ms ease-out forwards;
+}
+
+.hud-side {
+  right: 20px;
+  bottom: 20px;
+  width: min(360px, calc(100vw - 40px));
+  padding: 14px;
+  border-radius: 8px;
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.stat-grid > div {
+  min-width: 0;
+  padding: 11px;
+  border: 1px solid rgba(149, 255, 218, 0.16);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.stat-grid strong {
+  display: block;
+  margin-top: 4px;
+  overflow-wrap: anywhere;
+  font-family: "Cascadia Mono", "SFMono-Regular", Consolas, monospace;
+  font-size: 18px;
+}
+
+.upgrade-list {
+  display: grid;
+  gap: 8px;
+}
+
+.upgrade {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: 61px;
+  padding: 10px 12px;
+  border: 1px solid rgba(149, 255, 218, 0.18);
+  border-radius: 8px;
+  background: rgba(7, 14, 13, 0.72);
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  transition:
+    border-color 120ms ease,
+    background 120ms ease,
+    transform 120ms ease;
+}
+
+.upgrade:hover:not(:disabled) {
+  border-color: rgba(149, 255, 122, 0.58);
+  background: rgba(20, 47, 40, 0.88);
+  transform: translateY(-1px);
+}
+
+.upgrade:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
+.upgrade span {
+  min-width: 0;
+}
+
+.upgrade strong,
+.upgrade small {
+  display: block;
+}
+
+.upgrade strong {
+  font-size: 14px;
+}
+
+.upgrade small {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.upgrade em {
+  flex: 0 0 auto;
+  color: var(--amber);
+  font-family: "Cascadia Mono", "SFMono-Regular", Consolas, monospace;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.secondary-action {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 93, 115, 0.35);
+  border-radius: 8px;
+  background: rgba(255, 93, 115, 0.1);
+  color: #ffd7dc;
+  cursor: pointer;
+}
+
+.event-banner {
+  position: fixed;
+  left: 50%;
+  top: 24px;
+  z-index: 6;
+  display: grid;
+  min-width: min(420px, calc(100vw - 40px));
+  max-width: calc(100vw - 40px);
+  padding: 14px 18px;
+  border: 1px solid rgba(255, 209, 92, 0.42);
+  border-radius: 8px;
+  background: rgba(35, 24, 10, 0.88);
+  box-shadow: 0 18px 44px var(--shadow);
+  opacity: 0;
+  pointer-events: none;
+  text-align: center;
+  transform: translate(-50%, -20px);
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
+}
+
+.event-banner.is-visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.event-banner strong {
+  color: var(--amber);
+  font-size: 18px;
+}
+
+.event-banner span {
+  margin-top: 4px;
+  color: #ffe8ad;
+  font-size: 13px;
+}
+
+.goal-dialog {
+  width: min(390px, calc(100vw - 42px));
+  border: 1px solid rgba(149, 255, 122, 0.52);
+  border-radius: 8px;
+  background: var(--panel-strong);
+  color: var(--text);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.58);
+}
+
+.goal-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.58);
+  backdrop-filter: blur(4px);
+}
+
+.goal-dialog form {
+  display: grid;
+  gap: 14px;
+  padding: 8px;
+}
+
+.goal-dialog h2 {
+  color: var(--green);
+  font-size: 28px;
+}
+
+.goal-dialog p {
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.goal-dialog button {
+  padding: 12px 16px;
+  border: 0;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--cyan), var(--green));
+  color: #06100d;
+  cursor: pointer;
+  font-weight: 900;
+}
+
+body.is-fever .hud {
+  animation: feverShake 220ms linear 4;
+}
+
+@keyframes idlePulse {
+  0%,
+  100% {
+    opacity: 0.28;
+    transform: scale(0.94);
+  }
+  50% {
+    opacity: 0.72;
+    transform: scale(1.04);
+  }
+}
+
+@keyframes floatUp {
+  from {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -74px) scale(1.16);
+  }
+}
+
+@keyframes feverShake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-2px);
+  }
+  75% {
+    transform: translateX(2px);
+  }
+}
+
+@media (max-width: 760px) {
+  body {
+    overflow: auto;
+  }
+
+  .game-shell {
+    min-height: 100svh;
+    padding: 14px;
+  }
+
+  .hud,
+  .lab-stage,
+  .event-banner {
+    position: relative;
+  }
+
+  .hud-main,
+  .hud-side {
+    top: auto;
+    right: auto;
+    bottom: auto;
+    left: auto;
+    width: 100%;
+  }
+
+  .lab-stage {
+    min-height: 39svh;
+    margin: 10px 0;
+  }
+
+  .molecule-button {
+    width: min(62vw, 245px);
+  }
+
+  .event-banner {
+    left: auto;
+    top: auto;
+    min-width: 0;
+    margin: 10px 0;
+    transform: translateY(-8px);
+  }
+
+  .event-banner.is-visible {
+    transform: translateY(0);
+  }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    scroll-behavior: auto !important;
+    transition-duration: 1ms !important;
+  }
+}
