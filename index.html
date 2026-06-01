@@ -3,101 +3,128 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Mol Rush Clicker</title>
+    <title>Mol Rush Synth Lab</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <main class="game-shell">
-      <canvas id="molecule-field" aria-hidden="true"></canvas>
+      <canvas id="reactor-canvas" aria-label="ズーム表示された反応槽"></canvas>
 
-      <section class="hud hud-main" aria-label="進行状況">
+      <section class="hud hud-main" aria-label="実験状況">
         <div class="brand">
           <span class="brand-mark">μ</span>
           <div>
             <h1>Mol Rush</h1>
-            <p>分子を増やして 1 mol を突破</p>
+            <p data-i18n="tagline">分子を増やし、衝突でより複雑な分子へ合成</p>
           </div>
+          <button id="language-toggle" class="small-action" type="button">EN</button>
         </div>
 
         <div class="score-block">
-          <span class="label">Molecules</span>
-          <strong id="molecule-count">0</strong>
-          <span id="mol-progress-text" class="subtext">0 mol</span>
+          <span class="label">Research Value</span>
+          <strong id="score-value">0</strong>
+          <span id="mol-progress-text" class="subtext">0 mol 相当</span>
         </div>
 
         <div class="progress-track" aria-label="1 mol までの進行度">
           <div id="mol-progress-bar"></div>
         </div>
+
+        <div class="active-card">
+          <span class="label" data-i18n="activeMolecule">Active Molecule</span>
+          <strong id="active-name">水素 H2</strong>
+          <p id="active-desc">クリックで水素分子を増やします。</p>
+          <div class="mode-row" aria-label="投入モード">
+            <button class="mode-button is-active" type="button" data-feed-mode="single">単体</button>
+            <button class="mode-button" type="button" data-feed-mode="mix">比率</button>
+          </div>
+          <button id="click-target" class="primary-action" type="button">反応槽をクリックして増やす</button>
+        </div>
       </section>
 
-      <section class="lab-stage" aria-label="クリック操作">
-        <button id="click-target" class="molecule-button" type="button" aria-label="分子を増やす">
-          <span class="atom atom-a"></span>
-          <span class="atom atom-b"></span>
-          <span class="atom atom-c"></span>
-          <span class="bond bond-a"></span>
-          <span class="bond bond-b"></span>
-          <span class="tap-ring"></span>
-        </button>
-        <div id="floating-text-layer" class="floating-text-layer" aria-hidden="true"></div>
+      <section class="reactor-caption" aria-live="polite">
+        <strong id="reaction-title">Zoom Reactor</strong>
+        <span id="reaction-detail">画面内の分子オブジェクト同士が実際に衝突したときだけ反応します。</span>
       </section>
 
-      <aside class="hud hud-side" aria-label="研究設備">
+      <aside class="hud hud-side" aria-label="研究メニュー">
         <div class="stat-grid">
           <div>
             <span class="label">Click</span>
             <strong id="per-click">+1</strong>
           </div>
           <div>
-            <span class="label">Auto</span>
+            <span class="label">Auto Feed</span>
             <strong id="per-second">0/s</strong>
           </div>
         </div>
 
-        <div class="upgrade-list">
-          <button class="upgrade" type="button" data-upgrade="pipette">
-            <span>
-              <strong>マイクロピペット</strong>
-              <small>クリック量 +1</small>
-            </span>
-            <em id="pipette-cost">25</em>
-          </button>
-          <button class="upgrade" type="button" data-upgrade="catalyst">
-            <span>
-              <strong>触媒粒子</strong>
-              <small>毎秒生産を追加</small>
-            </span>
-            <em id="catalyst-cost">120</em>
-          </button>
-          <button class="upgrade" type="button" data-upgrade="chain">
-            <span>
-              <strong>連鎖反応</strong>
-              <small>クリック倍率 x2</small>
-            </span>
-            <em id="chain-cost">900</em>
-          </button>
-          <button class="upgrade" type="button" data-upgrade="reactor">
-            <span>
-              <strong>高圧リアクター</strong>
-              <small>全生産 x3</small>
-            </span>
-            <em id="reactor-cost">1.50e+4</em>
-          </button>
+        <div class="settings-strip" aria-label="表示設定">
+          <span class="label" data-i18n="displayDensity">Display</span>
+          <div class="mode-row compact">
+            <button class="mode-button" type="button" data-quality="low">Low</button>
+            <button class="mode-button is-active" type="button" data-quality="mid">Mid</button>
+            <button class="mode-button" type="button" data-quality="high">High</button>
+          </div>
         </div>
 
-        <button id="reset-button" class="secondary-action" type="button">リセット</button>
+        <button id="mute-toggle" class="secondary-action mute-action" type="button">Sound On</button>
+
+        <div class="panel-tabs" role="tablist" aria-label="研究パネル">
+          <button class="tab is-active" type="button" data-panel="molecules" data-i18n="moleculesTab">分子</button>
+          <button class="tab" type="button" data-panel="skills" data-i18n="skillsTab">スキル</button>
+          <button class="tab" type="button" data-panel="reactions" data-i18n="reactionsTab">反応</button>
+        </div>
+
+        <section id="panel-molecules" class="panel is-active" aria-label="分子カタログ">
+          <div id="molecule-list" class="molecule-list"></div>
+        </section>
+
+        <section id="panel-skills" class="panel" aria-label="スキルツリー">
+          <button id="open-skill-tree" class="primary-action tree-open-action" type="button" data-i18n="openTechTree">技術ツリーを開く</button>
+          <div id="skill-list" class="skill-list"></div>
+        </section>
+
+        <section id="panel-reactions" class="panel" aria-label="反応一覧">
+          <div id="reaction-list" class="reaction-list"></div>
+        </section>
+
+        <button id="reset-button" class="secondary-action" type="button" data-i18n="reset">リセット</button>
       </aside>
 
-      <section id="event-banner" class="event-banner" aria-live="polite">
-        <strong id="event-title">Synthesis Ready</strong>
-        <span id="event-detail">クリックで実験開始</span>
+      <section class="hud info-panel" aria-label="分子解説">
+        <span class="label" data-i18n="moleculeNotes">Molecule Notes</span>
+        <h2 id="info-name">水素 H2</h2>
+        <p id="info-formula">H-H</p>
+        <p id="info-desc">最も軽い二原子分子。アンモニアやメタノールなど、多くの工業的合成の還元剤として重要です。</p>
       </section>
+
+      <div id="floating-text-layer" class="floating-text-layer" aria-hidden="true"></div>
+
+      <section id="event-banner" class="event-banner" aria-live="polite">
+        <strong id="event-title">Synth Lab Ready</strong>
+        <span id="event-detail">まずは水素分子を増やしましょう。</span>
+      </section>
+
+      <dialog id="skill-tree-dialog" class="tree-dialog">
+        <form method="dialog" class="tree-shell">
+          <header class="tree-header">
+            <div>
+              <span class="label">Technology Tree</span>
+              <h2 data-i18n="techTreeTitle">合成技術ツリー</h2>
+            </div>
+            <button class="icon-action" type="submit" aria-label="閉じる">x</button>
+          </header>
+          <div id="skill-tree-map" class="tree-map" aria-label="技術ツリー"></div>
+        </form>
+      </dialog>
 
       <dialog id="goal-dialog" class="goal-dialog">
         <form method="dialog">
-          <h2>1 mol 達成</h2>
-          <p>6.022 x 10^23 個の分子を超えました。実験成功です。</p>
-          <button type="submit">続ける</button>
+          <div class="goal-burst" aria-hidden="true"></div>
+          <h2 data-i18n="goalTitle">1 mol 達成</h2>
+          <p data-i18n="goalBody">合計生成数が 6.022 x 10^23 個を超えました。ここからは医薬品分子の量産がハイスコア目標です。</p>
+          <button type="submit" data-i18n="continue">続ける</button>
         </form>
       </dialog>
     </main>
